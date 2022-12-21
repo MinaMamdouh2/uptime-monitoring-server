@@ -1,0 +1,26 @@
+{
+  "name": "bosta-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon server.js",
+    "start:prod": "NODE_ENV=production nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MinaMamdouh2/BOSTA-API.git"
+  },
+  "author": "Mina Mamdouh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MinaMamdouh2/BOSTA-API/issues"
+  },
+  "homepage": "https://github.com/MinaMamdouh2/BOSTA-API#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "morgan": "^1.10.0"
+  }
+}
