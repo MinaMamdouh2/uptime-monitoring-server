@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "prestart": "node utils/databaseIntialization.js",
     "start": "nodemon server.js",
     "start:prod": "NODE_ENV=production nodemon server.js"
   },
