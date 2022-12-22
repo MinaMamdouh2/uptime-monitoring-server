@@ -7,6 +7,9 @@ const morgan = require('morgan');
 // Importing express
 const express = require('express');
 
+// Importing router
+const router = require('./routes');
+
 // Initializng app
 const app = express();
 
@@ -15,9 +18,12 @@ app.use(morgan('dev'));
 app.use(cors());
 app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.status(200).json({
-    message: 'Hello from server!!',
+// Adding middleware routes
+app.use('/users', router.usersRouter);
+
+app.all('*', (req, res) => {
+  return res.status(404).json({
+    message: `Can't find ${req.originalUrl} on this server!`,
   });
 });
 
