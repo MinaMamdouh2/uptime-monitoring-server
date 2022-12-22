@@ -8,6 +8,7 @@ const dbConfig = {
   DB_PASSWORD: process.env.DB_PASSWORD,
   DATABASE_NAME: process.env.DATABASE_NAME,
   DB_PORT: process.env.DB_PORT,
+  DB_DIALECT: 'mysql',
 };
 
 // Export dbConfig

@@ -19,10 +19,14 @@
   },
   "homepage": "https://github.com/MinaMamdouh2/BOSTA-API#readme",
   "dependencies": {
+    "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "lodash": "^4.17.21",
     "morgan": "^1.10.0",
-    "mysql2": "^2.3.3"
+    "mysql2": "^2.3.3",
+    "nanoid": "^3.3.4",
+    "sequelize": "^6.28.0"
   }
 }
