@@ -2,16 +2,24 @@
 const express = require('express');
 
 // Import controllers
-const { usersControllers } = require('../controllers');
+const { usersControllers, authControllers } = require('../controllers');
 
 // Initializing express router
 const router = express.Router();
 
 // GET: Find all users
-router.route('/').get(usersControllers.findAll);
+router
+  .route('/')
+  .get(
+    authControllers.authenticateUser,
+    authControllers.authorizeUser('admin'),
+    usersControllers.findAll
+  );
 
 // POST: Create a user
-router.route('/').post(usersControllers.create);
+router
+  .route('/')
+  .post(usersControllers.create, authControllers.sendVerificationEmail);
 
 // Export users router
 module.exports = router;

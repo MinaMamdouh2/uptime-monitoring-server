@@ -8,7 +8,7 @@ const models = require('../models');
 const Users = models.Users;
 
 // Create user
-const create = async (req, res) => {
+const create = async (req, res, next) => {
   try {
     if (!req.body.email && !req.body.password)
       return res.status(400).json({
@@ -24,20 +24,18 @@ const create = async (req, res) => {
       return res.status(400).json({
         message: 'Email already existed',
       });
+
     await Users.create({
       uuid: Nanoid.nanoid(),
       email,
       password,
       role: req.body.role ? req.body.role : 'user',
-    }).then((user) =>
-      res.status(200).json({
-        message: 'User created',
-        user,
-      })
-    );
+    }).then(() => {
+      next();
+    });
   } catch (err) {
     console.log(err);
-    console.log('Catch - Users Controller - findAll');
+    console.log('Catch - Users Controller - create');
     res.status(400).json({
       message: 'Something went wrong!!',
     });

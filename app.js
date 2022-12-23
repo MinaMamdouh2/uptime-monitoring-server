@@ -20,6 +20,7 @@ app.use(express.json());
 
 // Adding middleware routes
 app.use('/users', router.usersRouter);
+app.use('/auth', router.authRouter);
 
 app.all('*', (req, res) => {
   return res.status(404).json({
