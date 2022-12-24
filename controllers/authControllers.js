@@ -172,7 +172,7 @@ const sendVerificationEmail = async (req, res) => {
       .sendMail(
         email,
         'Account Activation',
-        `Use this link ${jwtToken}to verify your email address.
+        `Use this link ${jwtToken} to verify your email address.
     If you didn’t ask to verify this address, you can ignore this email`
       )
       .then(() => {
@@ -226,7 +226,7 @@ const verifyEmail = async (req, res) => {
     }
     await Users.update(
       {
-        verified: true,
+        verified: 1,
       },
       {
         where: {
