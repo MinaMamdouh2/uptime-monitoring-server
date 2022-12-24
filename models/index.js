@@ -31,6 +31,15 @@ sequelize
 
 // Load models
 models.Users = require('./Users')(sequelize, Sequelize.DataTypes);
+models.URLChecks = require('./URLChecks')(sequelize, Sequelize.DataTypes);
+models.Reports = require('./Reports')(sequelize, Sequelize.DataTypes);
+
+// Create associations
+Object.keys(models).forEach((modelName) => {
+  if (models[modelName].associate) {
+    models[modelName].associate(db);
+  }
+});
 
 // Alter: true => migrate new columns to tables
 // Force: false => table are not dropped then re-created
