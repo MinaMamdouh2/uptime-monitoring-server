@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/MinaMamdouh2/BOSTA-API#readme",
   "dependencies": {
+    "axios": "^1.2.1",
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
