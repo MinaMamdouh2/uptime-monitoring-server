@@ -1,3 +1,4 @@
+// Import express
 const express = require('express');
 
 // Import controllers
@@ -5,8 +6,6 @@ const { authControllers } = require('../controllers');
 
 // Initializing express router
 const router = express.Router();
-
-//POST: login verified
 
 // POST: Send verification email
 router
