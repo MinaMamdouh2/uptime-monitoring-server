@@ -41,7 +41,116 @@ const create = async (req, res) => {
   }
 };
 
+// Update a specific URL check using id
+const updateOne = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const urlCheck = await URLChecks.findOne({
+      where: {
+        id,
+        createdBy: req.currentUser.id,
+        deletedAt: null,
+      },
+    });
+    if (!urlCheck)
+      return res.status(404).json({
+        message: 'URL Check not found',
+      });
+    await URLChecks.update(
+      { ...req.body },
+      {
+        where: {
+          id,
+          createdBy: req.currentUser.id,
+          deletedAt: null,
+        },
+      }
+    );
+    res.status(200).json({
+      message: 'URL Check has been updated!!',
+    });
+  } catch (err) {
+    console.log(err);
+    console.log('Catch - URL Check Controller - update');
+    res.status(400).json({
+      message: 'Something went wrong!!',
+    });
+  }
+};
+
+// Find a specific URL check using id
+const findOne = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const urlCheck = await URLChecks.findOne({
+      where: {
+        id,
+        deletedAt: null,
+        createdBy: req.currentUser.id,
+      },
+    });
+    if (!urlCheck)
+      return res.status(404).json({
+        message: 'URL Check not found',
+      });
+    res.status(200).json({
+      message: 'Success',
+      urlCheck,
+    });
+  } catch (err) {
+    console.log(err);
+    console.log('Catch - URL Check Controller - findOne');
+    res.status(400).json({
+      message: 'Something went wrong!!',
+    });
+  }
+};
+
+// Delete a specific URL check
+const deleteOne = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const urlCheck = await URLChecks.findOne({
+      where: {
+        id,
+        deletedAt: null,
+        createdBy: req.currentUser.id,
+      },
+    });
+    if (!urlCheck)
+      return res.status(404).json({
+        message: 'URL Check not found',
+      });
+    await URLChecks.update(
+      {
+        deletedAt: new Date(),
+        deletedBy: req.currentUser.id,
+      },
+      {
+        where: {
+          id,
+          deletedAt: null,
+          createdBy: req.currentUser.id,
+        },
+      }
+    );
+    res.status(200).json({
+      message: 'URL Check has beed deleted!!',
+    });
+  } catch (err) {
+    console.log(err);
+    console.log('Catch - URL Check Controller - findOne');
+    res.status(400).json({
+      message: 'Something went wrong!!',
+    });
+  }
+};
+
 // Export controllers
 module.exports = {
   create,
+  updateOne,
+  findOne,
+  deleteOne,
 };
