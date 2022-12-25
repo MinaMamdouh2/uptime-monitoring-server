@@ -17,7 +17,7 @@ const create = async (req, res) => {
       ...req.body,
       createdBy: req.currentUser.id,
     });
-    monitorURL(check.id);
+    monitorURL(check.id, check.interval);
     res.status(200).json({
       message: 'Check created',
     });
