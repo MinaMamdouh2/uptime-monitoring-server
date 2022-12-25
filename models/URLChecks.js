@@ -23,6 +23,9 @@ module.exports = (sequelize, DataTypes) => {
       protocol: {
         allowNull: false,
         type: DataTypes.STRING,
+        set(value) {
+          this.setDataValue('protocol', value.toUpperCase());
+        },
         validate: {
           isIn: [constants.protocol],
         },
