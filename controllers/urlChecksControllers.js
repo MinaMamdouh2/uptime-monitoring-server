@@ -15,9 +15,10 @@ const create = async (req, res) => {
   try {
     const check = await URLChecks.create({
       ...req.body,
+      trials: req.body.threshold ? req.body.threshold : 1,
       createdBy: req.currentUser.id,
     });
-    monitorURL(check.id, check.interval);
+    monitorURL(check.id, check.interval, req.currentUser.email);
     res.status(200).json({
       message: 'Check created',
     });
@@ -29,7 +30,7 @@ const create = async (req, res) => {
       sqlError.path === 'name'
     ) {
       return res.status(400).json({
-        message: `Name check is already taken, please try another name. You can try this name: ${Nanoid.nanoid()} `,
+        message: `Name check is already taken, please try another name. You can try this name: ${Nanoid.nanoid()}`,
       });
     }
     console.log(err);
