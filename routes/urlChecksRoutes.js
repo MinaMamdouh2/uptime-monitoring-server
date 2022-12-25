@@ -23,7 +23,8 @@ router
   .get(
     authControllers.authenticateUser,
     authControllers.authorizeUser('user'),
-    urlChecksControllers.findOne
+    urlChecksControllers.findOne,
+    urlChecksControllers.returnUrlCheck
   );
 
 // PUT: Update a check
@@ -32,6 +33,7 @@ router
   .put(
     authControllers.authenticateUser,
     authorizeUser('user'),
+    urlChecksControllers.findOne,
     urlChecksControllers.updateOne
   );
 // DELETE: delete a specific URL check
@@ -40,6 +42,7 @@ router
   .delete(
     authControllers.authenticateUser,
     authorizeUser('user'),
+    urlChecksControllers.findOne,
     urlChecksControllers.deleteOne
   );
 
