@@ -12,18 +12,16 @@ const recursiveCallingURL = async (checkId) => {
   if (!urlCheck || urlCheck.deletedAt || urlCheck.createdBy === null) return;
 
   setInterval(async () => {
-    httpClient
-      .get(
-        `${urlCheck.protocol.toLowerCase()}://${urlCheck.url}${
-          urlCheck.port ? `:${urlCheck.port}` : ''
-        }${urlCheck.path ? urlCheck.path : ''}`,
-        {},
-        {
-          auth: urlCheck.authentication ? urlCheck.authentication : null,
-        }
-      )
+    const url = `${urlCheck.protocol.toLowerCase()}://${urlCheck.url}${
+      urlCheck.port ? `:${urlCheck.port}` : ''
+    }${urlCheck.path ? urlCheck.path : ''}`;
+    httpClient(urlCheck.authentication, urlCheck.timeout)
+      .get(url)
       .then((res) => console.log(res.status, urlCheck.url))
-      .catch((err) => console.log(2));
+      .catch((err) => {
+        if (err.code && err.code === 'ECONNABORTED') console.log('Timeout');
+        console.log(err.response?.status, 'err');
+      });
   }, urlCheck.interval * 1000);
 };
 
