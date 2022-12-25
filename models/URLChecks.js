@@ -58,10 +58,15 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: 1,
       },
 
+      trials: {
+        type: DataTypes.INTEGER,
+      },
+
       authentication: {
         type: DataTypes.JSON,
         get() {
-          return JSON.parse(this.getDataValue('authentication'));
+          if (this.getDataValue('authentication'))
+            return JSON.parse(this.getDataValue('authentication'));
         },
         set(value) {
           this.setDataValue('authentication', JSON.stringify(value));
@@ -72,7 +77,8 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.JSON,
         field: 'https_headers',
         get() {
-          return JSON.parse(this.getDataValue('httpHeaders'));
+          if (this.getDataValue('httpHeaders'))
+            return JSON.parse(this.getDataValue('httpHeaders'));
         },
         set(value) {
           this.setDataValue('httpHeaders', JSON.stringify(value));
@@ -82,7 +88,8 @@ module.exports = (sequelize, DataTypes) => {
       assert: {
         type: DataTypes.JSON,
         get() {
-          return JSON.parse(this.getDataValue('assert'));
+          if (this.getDataValue('assert'))
+            return JSON.parse(this.getDataValue('assert'));
         },
         set(value) {
           this.setDataValue('assert', JSON.stringify(value));
@@ -92,7 +99,8 @@ module.exports = (sequelize, DataTypes) => {
       tags: {
         type: DataTypes.STRING,
         get() {
-          return this.getDataValue('tags').split(';');
+          if (this.getDataValue('tags'))
+            return this.getDataValue('tags').split(';');
         },
         set(value) {
           this.setDataValue('tags', value.join(';'));
