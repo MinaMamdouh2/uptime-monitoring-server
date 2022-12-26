@@ -8,7 +8,7 @@ const roles = ['admin', 'user'];
 const protocol = ['HTTP', 'HTTPS', 'TCP'];
 
 // Status report constants
-const status = ['available', 'error'];
+const status = ['available', 'down'];
 
 // Adding properties to constants object
 constants.roles = roles;

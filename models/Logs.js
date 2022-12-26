@@ -6,8 +6,8 @@ const constants = require('../config/constants');
 
 // Exporting User model
 module.exports = (sequelize, DataTypes) => {
-  const Reports = sequelize.define(
-    'reports',
+  const Logs = sequelize.define(
+    'logs',
     {
       status: {
         allowNull: false,
@@ -28,19 +28,15 @@ module.exports = (sequelize, DataTypes) => {
       },
 
       downtime: {
-        type: DataTypes.DATE,
+        type: DataTypes.FLOAT,
       },
 
       uptime: {
-        type: DataTypes.DATE,
+        type: DataTypes.FLOAT,
       },
 
       responseTime: {
-        type: DataTypes.DATE,
-      },
-
-      history: {
-        type: DataTypes.DATE,
+        type: DataTypes.FLOAT,
       },
 
       check: {
@@ -116,31 +112,31 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   // Association to fetch createdBy in object called creator
-  Reports.belongsTo(models.URLChecks, {
+  Logs.belongsTo(models.URLChecks, {
     foreignKey: 'check',
     as: 'check_id',
   });
 
   // Association to fetch createdBy in object called creator
-  Reports.belongsTo(models.Users, {
+  Logs.belongsTo(models.Users, {
     foreignKey: 'createdBy',
     as: 'creator',
   });
 
   // Association to fetch updatedBy in object called editor
-  Reports.belongsTo(models.Users, {
+  Logs.belongsTo(models.Users, {
     foreignKey: 'updatedBy',
     as: 'editor',
   });
 
   // Association to fetch updatedBy in object called editor
-  Reports.belongsTo(models.Users, {
+  Logs.belongsTo(models.Users, {
     foreignKey: 'deletedBy',
     as: 'deleter',
   });
 
   // Remove these attributes from JSON object
-  Reports.prototype.toJSON = function () {
+  Logs.prototype.toJSON = function () {
     const attributes = {
       ..._.omit(
         this.get(),
@@ -153,5 +149,5 @@ module.exports = (sequelize, DataTypes) => {
     return attributes;
   };
 
-  return Reports;
+  return Logs;
 };

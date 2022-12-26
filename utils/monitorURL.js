@@ -1,6 +1,7 @@
 // Import Models
 const models = require('../models');
 const URLChecks = models.URLChecks;
+const Logs = models.Logs;
 
 // Import httpClient
 const httpClient = require('./httpClient');
@@ -20,6 +21,14 @@ const recursiveCallingURL = (checkId, interval, email) => {
       urlCheck.port ? `:${urlCheck.port}` : ''
     }${urlCheck.path ? urlCheck.path : ''}`;
 
+    const lastLog = await Logs.findOne({
+      where: {
+        check: urlCheck.id,
+      },
+      order: [['id', 'DESC']],
+    });
+    // Get current time
+    const startTime = Date.now();
     httpClient(urlCheck.authentication, urlCheck.timeout)
       .get(url)
       .then(async (res) => {
@@ -49,28 +58,92 @@ const recursiveCallingURL = (checkId, interval, email) => {
                 'Catch - recursiveCallingURL - mail service - Up Notification'
               );
             });
+          if (urlCheck.webhook)
+            httpClient(null, 5)
+              .post(urlCheck.webhook, {
+                message: `At last, your URL: ${url} is up again :)`,
+              })
+              .then(() =>
+                console.log(
+                  `Pushing to webhook ${urlCheck.webhook} -Up notification`
+                )
+              )
+              .catch((err) => {
+                console.log(err);
+                console.log(
+                  'Catch - recursiveCallingURL - pushing service - Up Notification'
+                );
+              });
         }
+        await Logs.create({
+          check: checkId,
+          status: 'available',
+          outages: lastLog ? lastLog.outages : 0,
+          available: lastLog ? lastLog.available + 1 : 1,
+          uptime: lastLog
+            ? lastLog.status === 'available'
+              ? Math.abs(Date.now() - lastLog.createdAt) / 1000 + lastLog.uptime
+              : lastLog.uptime
+            : 0,
+          downtime: lastLog ? lastLog.downtime : 0,
+          responseTime: lastLog
+            ? lastLog.responseTime + Math.abs(Date.now() - startTime) / 1000
+            : Math.abs(Date.now() - startTime) / 1000,
+        });
+
         console.log(res.status, urlCheck.url);
       })
       .catch(async (err) => {
+        await Logs.create({
+          check: checkId,
+          status: 'down',
+          available: lastLog ? lastLog.available : 0,
+          outages: lastLog ? lastLog.outages + 1 : 1,
+          uptime: lastLog ? lastLog.uptime : 0,
+          downtime: lastLog
+            ? lastLog.status === 'down'
+              ? Math.abs(Date.now() - lastLog.createdAt) / 1000 +
+                lastLog.downtime
+              : lastLog.downtime
+            : 0,
+          responseTime: lastLog
+            ? lastLog.responseTime + Math.abs(Date.now() - startTime) / 1000
+            : Math.abs(Date.now() - startTime) / 1000,
+        });
         if (urlCheck.trials === 0) {
           await mailService
             .sendMail(
               email,
               'Your URL is down :(',
-              `Unfortunately, your link: ${url} is down :(`
+              `Unfortunately, your URL: ${url} is down :(`
             )
             .then(() =>
               console.log(
-                'Email sent successfully - recursiveCallingURL - Up Notification'
+                'Email sent successfully - recursiveCallingURL - down Notification'
               )
             )
             .catch((err) => {
               console.log(err);
               console.log(
-                'Catch - recursiveCallingURL - mail service - Up Notification'
+                'Catch - recursiveCallingURL - mail service -down Notification'
               );
             });
+          if (urlCheck.webhook)
+            httpClient(null, 5)
+              .post(urlCheck.webhook, {
+                message: `Unfortunately, your URL: ${url} is down :(`,
+              })
+              .then(() =>
+                console.log(
+                  `Pushing to webhook ${urlCheck.webhook} - down notification`
+                )
+              )
+              .catch((err) => {
+                console.log(err);
+                console.log(
+                  'Catch - recursiveCallingURL - pushing service - down Notification'
+                );
+              });
         }
         if (urlCheck.trials >= 0) {
           await URLChecks.update(
