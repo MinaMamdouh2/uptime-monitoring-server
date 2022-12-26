@@ -111,10 +111,10 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
-  // Association to fetch createdBy in object called creator
+  // Association to fetch URL Check in object called urlCheck
   Logs.belongsTo(models.URLChecks, {
     foreignKey: 'check',
-    as: 'check_id',
+    as: 'urlCheck',
   });
 
   // Association to fetch createdBy in object called creator
