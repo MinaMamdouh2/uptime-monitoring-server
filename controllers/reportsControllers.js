@@ -16,14 +16,14 @@ const getReport = async (req, res) => {
       },
       order: [['id', 'DESC']],
     });
-    const history = await Logs.findAndCountAll({
+    const timestamps = await Logs.findAndCountAll({
       where: {
         deletedAt: null,
         check: id,
       },
       limit: limit,
       offset: (page - 1) * limit,
-      order: [['id', 'ASC']],
+      order: [['id', 'DESC']],
       attributes: {
         exclude: [
           'status',
@@ -37,6 +37,8 @@ const getReport = async (req, res) => {
         ],
       },
     });
+    const history = [];
+    timestamps.rows.map((timestamp) => history.push(timestamp.createdAt));
 
     res.status(200).json({
       message: 'URL check report is generated',
@@ -50,15 +52,16 @@ const getReport = async (req, res) => {
         uptime: latestLog.uptime,
         responseTime:
           latestLog.responseTime / (latestLog.available + latestLog.outages),
-        history: {
-          timestamps: history.rows,
-          count: history.count,
+        timestamps: {
+          history,
+          resultsCount: urlChecks.rows.length,
+          totalCount: urlChecks.count,
         },
       },
     });
   } catch (err) {
     console.log(err);
-    console.log('Catch - URL Check Controller - findOne');
+    console.log('Catch - Reports Controller - getReport');
     res.status(400).json({
       message: 'Something went wrong!!',
     });
