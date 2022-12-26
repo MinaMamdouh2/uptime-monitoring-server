@@ -17,6 +17,15 @@ router
     urlChecksControllers.create
   );
 
+// GET: Get URL Checks
+router
+  .route('/')
+  .get(
+    authControllers.authenticateUser,
+    authControllers.authorizeUser('user'),
+    urlChecksControllers.find
+  );
+
 // GET: Get a specific URL CHECK
 router
   .route('/:id')

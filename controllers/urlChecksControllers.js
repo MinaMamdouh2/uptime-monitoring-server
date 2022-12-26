@@ -1,6 +1,9 @@
 // Import nanoid for the UUID
 const Nanoid = require('nanoid');
 
+// Import sequelize operator
+const { Op } = require('sequelize');
+
 // Import models
 const models = require('../models');
 
@@ -99,10 +102,48 @@ const findOne = async (req, res, next) => {
       return res.status(404).json({
         message: 'URL Check not found',
       });
+    req.urlCheck = urlCheck;
     next();
   } catch (err) {
     console.log(err);
     console.log('Catch - URL Check Controller - findOne');
+    res.status(400).json({
+      message: 'Something went wrong!!',
+    });
+  }
+};
+
+// Find all urls
+const find = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const tags = req.query.tags;
+    const orParams = tags.map((tag) => {
+      return { [Op.substring]: tag };
+    });
+    const urlChecks = await URLChecks.findAndCountAll({
+      where: {
+        deletedAt: null,
+        createdBy: req.currentUser.id,
+        tags: {
+          [Op.or]: orParams,
+        },
+      },
+      limit: limit,
+      offset: (page - 1) * limit,
+      order: [['id', 'ASC']],
+    });
+    console.log(urlChecks.rows.length);
+    res.status(200).json({
+      message: 'Fetched URL checks',
+      urlChecks: urlChecks.rows,
+      resultsCount: urlChecks.rows.length,
+      totalCount: urlChecks.count,
+    });
+  } catch (err) {
+    console.log(err);
+    console.log('Catch - URL Check Controller - find');
     res.status(400).json({
       message: 'Something went wrong!!',
     });
@@ -144,6 +185,7 @@ module.exports = {
   create,
   updateOne,
   findOne,
+  find,
   deleteOne,
   returnUrlCheck,
 };
