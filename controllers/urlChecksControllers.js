@@ -118,23 +118,34 @@ const find = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const tags = req.query.tags;
-    const orParams = tags.map((tag) => {
-      return { [Op.substring]: tag };
-    });
+    const tags = req.query.tags || [];
+    let orParams;
+
+    if (typeof tags === 'object')
+      orParams = tags.map((tag) => {
+        return { [Op.substring]: tag };
+      });
+    if (typeof tags === 'string') orParams = { [Op.substring]: tags };
+
+    const whereParams = orParams
+      ? {
+          deletedAt: null,
+          createdBy: req.currentUser.id,
+          tags: {
+            [Op.or]: orParams,
+          },
+        }
+      : { deletedAt: null, createdBy: req.currentUser.id };
+
     const urlChecks = await URLChecks.findAndCountAll({
       where: {
-        deletedAt: null,
-        createdBy: req.currentUser.id,
-        tags: {
-          [Op.or]: orParams,
-        },
+        ...whereParams,
       },
       limit: limit,
       offset: (page - 1) * limit,
       order: [['id', 'ASC']],
     });
-    console.log(urlChecks.rows.length);
+
     res.status(200).json({
       message: 'Fetched URL checks',
       urlChecks: urlChecks.rows,
