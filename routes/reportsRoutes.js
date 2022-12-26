@@ -11,6 +11,16 @@ const {
 // Initializing express router
 const router = express.Router();
 
+//GET: Get reports
+router
+  .route('/')
+  .get(
+    authControllers.authenticateUser,
+    authControllers.authorizeUser('user'),
+    urlChecksControllers.find,
+    reportsControllers.find
+  );
+
 // GET: Get a report for a specific URL check
 router
   .route('/:id')
@@ -18,7 +28,7 @@ router
     authControllers.authenticateUser,
     authControllers.authorizeUser('user'),
     urlChecksControllers.findOne,
-    reportsControllers.getReport
+    reportsControllers.findOne
   );
 
 // Export router

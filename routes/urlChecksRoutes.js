@@ -23,7 +23,8 @@ router
   .get(
     authControllers.authenticateUser,
     authControllers.authorizeUser('user'),
-    urlChecksControllers.find
+    urlChecksControllers.find,
+    urlChecksControllers.returnUrlChecks
   );
 
 // GET: Get a specific URL CHECK

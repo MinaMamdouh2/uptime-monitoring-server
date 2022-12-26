@@ -71,7 +71,7 @@ const updateOne = async (req, res) => {
   }
 };
 
-// Find a specific URL check using id
+// Return URL Check from findOne controller
 const returnUrlCheck = async (req, res) => {
   try {
     res.status(200).json({
@@ -80,7 +80,7 @@ const returnUrlCheck = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-    console.log('Catch - URL Check Controller - find');
+    console.log('Catch - URL Check Controller - returnUrlCheck');
     res.status(400).json({
       message: 'Something went wrong!!',
     });
@@ -114,7 +114,7 @@ const findOne = async (req, res, next) => {
 };
 
 // Find all urls
-const find = async (req, res) => {
+const find = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -145,16 +145,29 @@ const find = async (req, res) => {
       offset: (page - 1) * limit,
       order: [['id', 'ASC']],
     });
-
-    res.status(200).json({
-      message: 'Fetched URL checks',
-      urlChecks: urlChecks.rows,
-      resultsCount: urlChecks.rows.length,
-      totalCount: urlChecks.count,
-    });
+    req.urlChecks = urlChecks;
+    next();
   } catch (err) {
     console.log(err);
     console.log('Catch - URL Check Controller - find');
+    res.status(400).json({
+      message: 'Something went wrong!!',
+    });
+  }
+};
+
+// Return URL Checks from find controller
+const returnUrlChecks = async (req, res) => {
+  try {
+    res.status(200).json({
+      message: 'Fetched URL checks',
+      urlChecks: req.urlChecks.rows,
+      resultsCount: req.urlChecks.rows.length,
+      totalCount: req.urlChecks.count,
+    });
+  } catch (err) {
+    console.log(err);
+    console.log('Catch - URL Check Controller - returnURLChecks');
     res.status(400).json({
       message: 'Something went wrong!!',
     });
@@ -199,4 +212,5 @@ module.exports = {
   find,
   deleteOne,
   returnUrlCheck,
+  returnUrlChecks,
 };
