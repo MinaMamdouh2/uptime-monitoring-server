@@ -36,6 +36,7 @@ router
     urlChecksControllers.findOne,
     urlChecksControllers.updateOne
   );
+
 // DELETE: delete a specific URL check
 router
   .route('/:id')

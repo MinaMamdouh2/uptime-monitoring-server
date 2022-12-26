@@ -22,6 +22,7 @@ app.use(express.json());
 app.use('/users', router.usersRouter);
 app.use('/auth', router.authRouter);
 app.use('/checks', router.urlChecksRouter);
+app.use('/reports', router.reportsRouter);
 
 app.all('*', (req, res) => {
   return res.status(404).json({
