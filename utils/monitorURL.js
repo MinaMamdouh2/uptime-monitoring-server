@@ -14,7 +14,7 @@ const httpsAgent = new https.Agent({
 });
 
 // Import mail utils
-const mailService = require('../utils/MailService');
+const mailService = require('./mailService');
 
 const recursiveCallingURL = (checkId, interval, email) => {
   setInterval(async () => {
