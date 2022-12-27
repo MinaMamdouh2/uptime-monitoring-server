@@ -1,6 +1,7 @@
+// Import Axios
 const axios = require('axios');
 
-const httpClient = (basicAuth, timeout) => {
+const httpClient = (basicAuth, timeout, httpHeaders) => {
   return axios.create({
     withCredentials: true,
     timeout: 1000 * timeout,
@@ -10,6 +11,7 @@ const httpClient = (basicAuth, timeout) => {
         'Content-Type': 'application/json',
         Accept: 'application/json',
       },
+      ...httpHeaders,
     },
   });
 };

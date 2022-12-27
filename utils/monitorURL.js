@@ -6,6 +6,12 @@ const Logs = models.Logs;
 // Import httpClient
 const httpClient = require('./httpClient');
 
+// Import https
+const https = require('https');
+const httpsAgent = new https.Agent({
+  rejectUnauthorized: false,
+});
+
 // Import mail utils
 const mailService = require('../utils/MailService');
 
@@ -29,9 +35,13 @@ const recursiveCallingURL = (checkId, interval, email) => {
     });
     // Get current time
     const startTime = Date.now();
-    httpClient(urlCheck.authentication, urlCheck.timeout)
-      .get(url)
+    httpClient(urlCheck.authentication, urlCheck.timeout, urlCheck.httpHeaders)
+      .get(url, { httpsAgent: urlCheck.ignoreSSL ? httpsAgent : null })
       .then(async (res) => {
+        if (urlCheck.assert?.statusCode) {
+          if (res.status && urlCheck.assert.statusCode !== res.status)
+            throw new Error(`Assertion Error ${res.status}`);
+        }
         if (urlCheck.trials === -1) {
           await URLChecks.update(
             { trials: urlCheck.threshold },
@@ -49,7 +59,7 @@ const recursiveCallingURL = (checkId, interval, email) => {
             )
             .then(() =>
               console.log(
-                'Email sent successfully - recursiveCallingURL - Up Notification'
+                `Email sent successfully - recursiveCallingURL - Up Notification - URL: ${url} - URL Check ID ${checkId}`
               )
             )
             .catch((err) => {
@@ -59,13 +69,17 @@ const recursiveCallingURL = (checkId, interval, email) => {
               );
             });
           if (urlCheck.webhook)
-            httpClient(null, 5)
-              .post(urlCheck.webhook, {
-                message: `At last, your URL: ${url} is up again :)`,
-              })
+            httpClient(null, 5, null)
+              .post(
+                urlCheck.webhook,
+                {
+                  message: `At last, your URL: ${url} is up again :)`,
+                },
+                { httpsAgent: urlCheck.ignoreSSL ? httpsAgent : null }
+              )
               .then(() =>
                 console.log(
-                  `Pushing to webhook ${urlCheck.webhook} -Up notification`
+                  `Pushing to webhook ${urlCheck.webhook} -Up notification - URL: ${url} - URL Check ID ${checkId}`
                 )
               )
               .catch((err) => {
@@ -91,7 +105,7 @@ const recursiveCallingURL = (checkId, interval, email) => {
             : Math.abs(Date.now() - startTime) / 1000,
         });
 
-        console.log(res.status, urlCheck.url);
+        console.log(`UP - URL: ${url} - URL Check ID ${checkId}`);
       })
       .catch(async (err) => {
         await Logs.create({
@@ -119,7 +133,7 @@ const recursiveCallingURL = (checkId, interval, email) => {
             )
             .then(() =>
               console.log(
-                'Email sent successfully - recursiveCallingURL - down Notification'
+                `Email sent successfully - recursiveCallingURL - down Notification - URL: ${url} - URL Check ID ${checkId}`
               )
             )
             .catch((err) => {
@@ -129,13 +143,17 @@ const recursiveCallingURL = (checkId, interval, email) => {
               );
             });
           if (urlCheck.webhook)
-            httpClient(null, 5)
-              .post(urlCheck.webhook, {
-                message: `Unfortunately, your URL: ${url} is down :(`,
-              })
+            httpClient(null, 5, null)
+              .post(
+                urlCheck.webhook,
+                {
+                  message: `Unfortunately, your URL: ${url} is down :(`,
+                },
+                { httpsAgent: urlCheck.ignoreSSL ? httpsAgent : null }
+              )
               .then(() =>
                 console.log(
-                  `Pushing to webhook ${urlCheck.webhook} - down notification`
+                  `Pushing to webhook ${urlCheck.webhook} - down notification - URL: ${url} - URL Check ID ${checkId}`
                 )
               )
               .catch((err) => {
@@ -156,8 +174,19 @@ const recursiveCallingURL = (checkId, interval, email) => {
             console.log(`catch - catch err request - recursiveCallingURL`);
           });
         }
-        if (err.code && err.code === 'ECONNABORTED') console.log('Timeout');
-        console.log(err.response?.status ? err.response.status : 'err');
+
+        if (err.code && err.code === 'ECONNABORTED')
+          console.log(`DOWN - timeout - ${url} - URL Check ID ${checkId}`);
+        else if (err.message?.includes('Assertion Error'))
+          console.log(
+            `DOWN - Assertion failed - Assert status code ${
+              urlCheck.assert.statusCode
+            } - Response status code ${err.message.replace(
+              'Assertion Error ',
+              ''
+            )} - URL: ${url} - URL Check ID ${checkId}`
+          );
+        else console.log(`DOWN -  ${url} - URL Check ID ${checkId}`);
       });
   }, interval * 1000);
 };
