@@ -54,7 +54,7 @@ const updateOne = async (req, res) => {
     const { id } = req.params;
 
     await URLChecks.update(
-      { ...req.body },
+      { ...req.body, updatedAt: new Date(), updatedBy: req.currentUser.id },
       {
         where: {
           id,
