@@ -7,6 +7,10 @@ const URLChecks = models.URLChecks;
 
 const findOne = async (req, res) => {
   try {
+    if (!req.params.id)
+      return res.status(400).json({
+        message: 'Please provide an id',
+      });
     const { id } = req.params;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;

@@ -47,6 +47,10 @@ const create = async (req, res) => {
 // Update a specific URL check using id
 const updateOne = async (req, res) => {
   try {
+    if (!req.params.id)
+      return res.status(400).json({
+        message: 'Please provide an id',
+      });
     const { id } = req.params;
 
     await URLChecks.update(
@@ -90,6 +94,10 @@ const returnUrlCheck = async (req, res) => {
 // Find a specific URL check using id
 const findOne = async (req, res, next) => {
   try {
+    if (!req.params.id)
+      return res.status(400).json({
+        message: 'Please provide an id',
+      });
     const { id } = req.params;
     const urlCheck = await URLChecks.findOne({
       where: {
