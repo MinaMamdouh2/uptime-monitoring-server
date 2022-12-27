@@ -1,0 +1,36 @@
+version: '3.8'
+
+services: 
+  mysql:
+    image: mysql:8.0
+    restart: always
+    env_file: ./.env
+    environment:
+      MYSQL_ROOT_PASSWORD: $DB_ROOT_PASSWORD
+      MYSQL_DATABASE: $DATABASE_NAME
+    ports:
+      - $DB_PORT:$DB_PORT
+    volumes: 
+      - db:/var/lib/mysql
+  
+  app:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: uptimemonitoring/app
+    depends_on:
+      - mysql
+    ports:
+      - $NODE_LOCAL_PORT:$DOCKER_LOCAL_PORT
+    environment:
+      - DB_HOST=mysql
+      - DB_USER=$DB_USER
+      - DB_PASSWORD=$DB_PASSWORD
+      - DB_ROOT_PASSWORD = $DB_ROOT_PASSWORD
+      - DB_NAME=$DATABASE_NAME
+      - DB_PORT=$DB_DOCKER_PORT
+    stdin_open: true
+    tty: true
+
+volumes: 
+  db:

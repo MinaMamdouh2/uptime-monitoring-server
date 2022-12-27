@@ -11,7 +11,7 @@ const models = require('../models');
 const Users = models.Users;
 
 // Import mail utils
-const mailService = require('../utils/MailService');
+const mailService = require('../utils/mailService');
 
 // Signin token with payload
 const signToken = (payload, key, expiresIn) => {
