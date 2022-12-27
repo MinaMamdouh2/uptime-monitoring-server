@@ -2,6 +2,7 @@
 const models = require('../models');
 const URLChecks = models.URLChecks;
 const Logs = models.Logs;
+const Users = models.Users;
 
 // Import httpClient
 const httpClient = require('./httpClient');
@@ -17,10 +18,21 @@ const mailService = require('../utils/MailService');
 
 const recursiveCallingURL = (checkId, interval, email) => {
   setInterval(async () => {
-    const urlCheck = await URLChecks.findByPk(checkId);
+    const urlCheck = await URLChecks.findOne({
+      where: {
+        id: checkId,
+      },
+      include: [
+        {
+          model: Users,
+          as: 'creator',
+          attributes: ['deletedAt'],
+        },
+      ],
+    });
 
     // Check if url check exsits or is deleted or the user who created it is deleted
-    if (!urlCheck || urlCheck.deletedAt || urlCheck.createdBy === null)
+    if (!urlCheck || urlCheck.deletedAt || urlCheck.creator.deletedAt)
       return clearInterval(this);
 
     const url = `${urlCheck.protocol.toLowerCase()}://${urlCheck.url}${

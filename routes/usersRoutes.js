@@ -15,11 +15,30 @@ router
     authControllers.authorizeUser('admin'),
     usersControllers.findAll
   );
+// GET: Find user by id
+router
+  .route('/:id')
+  .get(
+    authControllers.authenticateUser,
+    authControllers.authorizeUser('admin'),
+    usersControllers.findOne,
+    usersControllers.returnUser
+  );
 
 // POST: Create a user
 router
   .route('/')
   .post(usersControllers.create, authControllers.sendVerificationEmail);
+
+// GET: Find user by id
+router
+  .route('/:id')
+  .delete(
+    authControllers.authenticateUser,
+    authControllers.authorizeUser('admin'),
+    usersControllers.findOne,
+    usersControllers.deleteOne
+  );
 
 // Export users router
 module.exports = router;

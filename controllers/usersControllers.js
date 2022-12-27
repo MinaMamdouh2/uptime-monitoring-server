@@ -71,7 +71,84 @@ const findAll = async (req, res) => {
   }
 };
 
+const findOne = async (req, res, next) => {
+  try {
+    if (!req.params.id)
+      return res.status(400).json({
+        message: 'Failed, please provide a user id',
+      });
+
+    const { id } = req.params;
+    const user = await Users.findOne({
+      where: {
+        deletedAt: null,
+        id,
+      },
+    });
+
+    if (!user)
+      return res.status(400).json({
+        message: 'User not found',
+      });
+    req.user = user;
+    next();
+  } catch (err) {
+    console.log(err);
+    console.log('Catch - Users Controller - delete');
+    res.status(400).json({
+      message: 'Something went wrong!!',
+    });
+  }
+};
+
+// Return User returned from findOne middleware
+const returnUser = async (req, res) => {
+  try {
+    res.status(200).json({
+      message: 'Fetched user',
+      user: req.user,
+    });
+  } catch (err) {
+    console.log(err);
+    console.log('Catch - Users Controller - delete');
+    res.status(400).json({
+      message: 'Something went wrong!!',
+    });
+  }
+};
+// Delete a specific URL check
+const deleteOne = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await Users.update(
+      {
+        deletedAt: new Date(),
+        deletedBy: req.currentUser.id,
+      },
+      {
+        where: {
+          id,
+          deletedAt: null,
+        },
+      }
+    );
+    res.status(200).json({
+      message: 'User has beed deleted!!',
+    });
+  } catch (err) {
+    console.log(err);
+    console.log('Catch - Users Controller - delete');
+    res.status(400).json({
+      message: 'Something went wrong!!',
+    });
+  }
+};
+
 module.exports = {
   create,
   findAll,
+  findOne,
+  returnUser,
+  deleteOne,
 };
